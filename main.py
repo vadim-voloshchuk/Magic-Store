@@ -1,82 +1,87 @@
 from common.pereferences import STORE_PATH, INVENTORY_PATH
 from modules.work_with_files import load_inventory_from_txt, load_items_from_json
-from modules.hello_funcs import clear_console
+from modules.core.store_magicstore import MagicStore
 
-import json
+class MainGame:
+    def __init__(self, player_name = "Игрок 1"):
+        self.player_name = player_name
 
-class Item:
-    def __init__(self, name = "Простой товар", count = 1, cost = 0, rating = 0, 
-                product_composition = ["компонент 1", "компонент 2"],
-                 description = "Условное описание"):
+        self.hello_player()
+
+        while True:
+            self.show_main_menu()
+
+            choice = int(input("Я выбираю: "))
+
+            if choice == 1:
+                self.start_game()
+
+            if choice == 3:
+                break
         
-        self.name = name
-        self.count = count
-        self.cost = cost
-        self.rating = rating
-        self.product_composition = product_composition
-        self.description = description
-    
-    def __str__(self):
-        return f"Товар с названием: '{self.name}'"
+        print("Спасибо за игру!")
 
-    def get_description(self):
-        return self.description
-    
-    def get_count(self):
-        return self.count
-    
-    def get_cost(self):
-        return self.cost
-    
-    def get_name(self):
-        return self.name
-    
-    def get_rating(self):
-        return self.rating
-
-    def get_product_composition(self):
-        return self.product_composition
-    
-    def get_description(self):
-        return self.description
-
-    def show_product_composition(self):
-        print(f"Состав продукта: '{self.name}'")
-        for pc in self.product_composition:
-            print(pc)
-
-class MagicStore:
-    def __init__(self, name = "Полуночный Котел", store_size = 10000):
-        self.name = name
-        self.store_size = store_size
-        self.current_size = 0
-        self.items = []
-    
-    def load_items_from_file(self, items_path):
-        with open(items_path, 'r', encoding='utf-8') as file:
-            json_items = json.load(file)
+    def show_main_menu(self):
+        print("1. Начать новую игру")
+        print("2. Продолжить")
+        print("3. Выйти")
         
-        for i,item in json_items.items():
-            current_item = Item(name = item['name'],
-                                count=item['count'])
+    def show_menu_items(self):
+        print("1. Показать список товаров")
+        print("2. Купить товар")
+        print("3. Показать мой инвентарь")
+        print("4. Заказать товар в магазин")
+        print("5. Получить подробную информацию о товаре")
 
-            #TODO: Добить здесь поля товара (говорить и писать что у меня лапки запрещено!!!!)
+        print("6. Выход")
+
+    def hello_player(self):
+        print(f"Здравствуй {self.player_name}, хочу тебя поздравить, ты пришёл по адресу.")
+
+    def start_game(self):
+        self.my_ms = MagicStore()
+        self.my_ms.generate_items()
+        while True:
+            self.show_menu_items()
+
+            choice = int(input("Я выбираю: "))
+
+            if choice == 1:
+                self.my_ms.show_items()
             
-            print(f"В магический магазин {self.name} добавлен товар!")
-            print(current_item)
-            self.items.append(current_item)
+            # if choice == 2:
+            #     buy_item(items, our_items, our_money)
+            
+            # if choice == 3:
+            #     show_inventory(our_items, our_money)
+            
+            if choice == 4:
+                name = input("Введите имя товара: ")
+                count = int(input("Введите количество товара: "))
+                cost = int(input("Введите стоимость товара: "))
+                description = input("Введите описание товара: ")
 
-    def show_items(self):
-        print("=" * 100)
-        for product in self.items:
-            print(f"Имя товара: {product.get_name()}, Количество на складе 🏯: {product.get_count()}, Стоимость в рублях💵: {product.get_cost()}, Рейтинг⭐️: {product.get_rating()}/10")
-        print("=" * 100)
+                elements = []
+
+                comp_count = int(input("Введите количество элементов в составе товара: "))
+                for _ in range(comp_count):
+                    element = input("Введите элемент в составе товара: ")
+                    elements.append(element)
+                self.my_ms.add_item(name=name, cost=cost, count=count, description=description, elements=elements)
+            
+            if choice == 5:
+                name = input("Введите имя товара: ")
+                self.my_ms.show_item(name)
+                
+            if choice == 6:
+                # save_items_to_json(STORE_PATH, items)
+                # save_inventory_to_txt(INVENTORY_PATH, our_items, our_money)
+
+                print("Спасибо, что посетили наш магазин! Возвращайтесь ещё!")
+                break
 
 
-ms1 = MagicStore()
+game = MainGame()
 
-ms1.load_items_from_file(STORE_PATH)
-
-ms1.show_items()
-
-#TODO: добавить в класс MagicStore методы add_item, show_item, rate_item
+# TODO: Сделать класс Invenory (ИГРОКА) и добавить его в игру :)
+# Добавить в класс магазина метод buy_item, который будет покупать товар из магазина и добавлять в инвентарь :)
